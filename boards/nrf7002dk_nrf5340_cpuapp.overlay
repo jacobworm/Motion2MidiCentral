@@ -1,0 +1,8 @@
+&uart1 {
+    status = "okay";
+    current-speed = <31250>;
+};
+&i2c1 {
+    status = "disabled";
+};
+
