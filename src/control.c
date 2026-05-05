@@ -26,10 +26,10 @@ midiEvent createMidiEventFromBluetooth(int bluetooth_event) {
     }
 
     // For testing: static output c-note
-    event.channel = 1;
+    /*event.channel = 1;
     event.type = NoteOn;
     event.data1 = 60;
-    event.data2 = 100;
+    event.data2 = 100;*/
     return event;
 }
 
@@ -48,6 +48,16 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
     };
     (void)p3;
 
+    // TEST KODE, bare for at se at BLE data rent faktisk ændre på nogle settings
+    gestureSettings[0].noteNr = 60;  // C4
+    gestureSettings[1].noteNr = 62;  // D4
+    gestureSettings[2].noteNr = 64;  // E4
+    gestureSettings[3].noteNr = 65;  // F4
+    gestureSettings[4].noteNr = 67;  // G4
+    gestureSettings[5].noteNr = 69;  // A4
+    gestureSettings[6].noteNr = 71;  // B4
+    gestureSettings[7].noteNr = 72;  // C5
+
     struct k_msgq *midi_q = (struct k_msgq *)midi_q_ptr;
     struct k_msgq *control_q = (struct k_msgq *)control_q_ptr;
     
@@ -55,14 +65,12 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
         return;
     }
     while (1) {
-    // Waiting for bluetooth queue simulated by wait
-    k_sleep(K_MSEC(1000)); // Simulate waiting for a bluetooth_q event to be ready
-    int bluetooth_event = 1; // Simulated Bluetooth event for testing
+        gestureEvent gesture;
+        k_msgq_get(control_q, &gesture, K_FOREVER);
+        
+        midiEvent event = createMidiEventFromBluetooth((int)gesture);
 
-    
-    midiEvent event = createMidiEventFromBluetooth(bluetooth_event);
-
-    //dispatch event to midi queue    
-    k_msgq_put(midi_q, &event, K_NO_WAIT); // Send the MIDI event to the midi_q    
+        //dispatch event to midi queue    
+        k_msgq_put(midi_q, &event, K_NO_WAIT); // Send the MIDI event to the midi_q    
     }
 }
