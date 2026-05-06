@@ -1,6 +1,8 @@
 #include "BLE_central.h"
 #include "gestureEvent.h"
 
+uint8_t BLE_scan(); //så disconnected kan se den
+
 // ------------------ subscribe struktur START ----------------
 // kommer her fra https://github.com/zephyrproject-rtos/zephyr/blob/main/samples/bluetooth/central_hr/src/main.c#L73
 static struct bt_gatt_subscribe_params subscribe_params;
@@ -77,6 +79,8 @@ static void connected(struct bt_conn *conn, uint8_t err)
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
         printk("Forbindelse afbrudt, reason: %d\n", reason);
+
+        BLE_scan();
 }
 
 BT_CONN_CB_DEFINE(conn_callbacks) = {
@@ -91,7 +95,8 @@ static bool BLE_check_addr(struct bt_data *data, void *user_data)
 {
         const bt_addr_le_t *addr = (const bt_addr_le_t *)user_data;     //skal caste userdata til bt_addr_le_t
 
-        if (data->type == BT_DATA_UUID128_ALL) {                //TYPE: fandt ud af dte var nemmer at matche UUID end navn Thinkerbell
+        if (data->type == BT_DATA_UUID128_ALL) {                //TYPE: fandt ud af dte var nemmer at 
+
 
         const uint8_t uuid[] = {                                //Det UUID som er sat på Photon
                 0xab, 0x90, 0x78, 0x56, 0x34, 0x12, 0x34, 0x12,

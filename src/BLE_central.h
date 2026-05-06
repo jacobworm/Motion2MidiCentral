@@ -15,12 +15,6 @@
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/sys/byteorder.h>
 
-#define DEVICE_NAME "Thinkerbell"
-
-
-uint8_t BLE_init();
-
-uint8_t BLE_scan();
 
 void BLE_ThreadFunct(void *control_q_ptr, void *p2, void *p3);
 
