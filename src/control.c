@@ -8,20 +8,20 @@ int Control_init(void) {
   return 0; // Return 0 on success
 }
 
-midiEvent createMidiEventFromBluetooth(int bluetooth_event) {    
+midiEvent createMidiEventFromGestureEvent(int gesture_event) {    
     midiEvent event;
-    event.type = gestureSettings[bluetooth_event].type;
-    event.channel = gestureSettings[bluetooth_event].channel;
+    event.type = gestureSettings[gesture_event].type;
+    event.channel = gestureSettings[gesture_event].channel;
     if(event.type == ControlChange) {
-        event.data1 = gestureSettings[bluetooth_event].controllerNr;
-        event.data2 = gestureSettings[bluetooth_event].value;
+        event.data1 = gestureSettings[gesture_event].controllerNr;
+        event.data2 = gestureSettings[gesture_event].value;
     }
     if(event.type == NoteOn || event.type == NoteOff) {
-        event.data1 = gestureSettings[bluetooth_event].noteNr;
-        event.data2 = gestureSettings[bluetooth_event].velocity;
+        event.data1 = gestureSettings[gesture_event].noteNr;
+        event.data2 = gestureSettings[gesture_event].velocity;
     }
     else {
-        event.data1 = gestureSettings[bluetooth_event].value;
+        event.data1 = gestureSettings[gesture_event].value;
         event.data2 = 0; // Assuming value is stored in data1
     }
 
