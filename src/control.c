@@ -68,7 +68,7 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
         gestureEvent gesture;
         k_msgq_get(control_q, &gesture, K_FOREVER);
         
-        midiEvent event = createMidiEventFromBluetooth((int)gesture);
+        midiEvent event = createMidiEventFromGestureEvent((int)gesture);
 
         //dispatch event to midi queue    
         k_msgq_put(midi_q, &event, K_NO_WAIT); // Send the MIDI event to the midi_q    

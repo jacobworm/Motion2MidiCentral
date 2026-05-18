@@ -2,6 +2,8 @@
 #include "gestureEvent.h"
 
 uint8_t BLE_scan(); //så disconnected kan se den
+static struct bt_conn *thinkerbell_conn = NULL;
+static bool ready_to_scan = true;
 
 // ------------------ subscribe struktur START ----------------
 // kommer her fra https://github.com/zephyrproject-rtos/zephyr/blob/main/samples/bluetooth/central_hr/src/main.c#L73
@@ -43,11 +45,6 @@ static uint8_t discover_func(struct bt_conn *conn, const struct bt_gatt_attr *at
                 return BT_GATT_ITER_STOP;
         }
 
-        uint8_t uuid_str[BT_UUID_STR_LEN];
-        bt_uuid_to_str(attr->uuid, uuid_str, sizeof(uuid_str));
-        printk("Handle %d, UUID: %s\n", attr->handle, uuid_str);
-
-        printk("Discovery: handle %d\n", attr->handle);
         return BT_GATT_ITER_CONTINUE;
 }
 
@@ -57,14 +54,20 @@ static uint8_t discover_func(struct bt_conn *conn, const struct bt_gatt_attr *at
 //-------- connect/disconnect struktur START----------------
 //kommer fra https://github.com/zephyrproject-rtos/zephyr/blob/main/samples/bluetooth/central/src/main.c
 
-static struct bt_conn *thinkerbell_conn;
 
 static void connected(struct bt_conn *conn, uint8_t err)
 {
         if (err) {
                 printk("Forbindelse fejlede, err: %d\n", err);
+                bt_conn_unref(thinkerbell_conn);
+                bt_le_scan_stop();              //stopper scan
+                thinkerbell_conn = NULL;
+
+                ready_to_scan = true;
+
                 return;
         }
+        thinkerbell_conn = conn;
         printk("Forbundet til Thinkerbell!\n"); 
 
         //discovery parameter sættes her
@@ -78,9 +81,18 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
 {
+
         printk("Forbindelse afbrudt, reason: %d\n", reason);
 
-        BLE_scan();
+        if(thinkerbell_conn != conn){
+                printk("hej");
+                return;
+        }
+        bt_conn_unref(thinkerbell_conn);
+
+        thinkerbell_conn = NULL;
+        ready_to_scan = true;
+
 }
 
 BT_CONN_CB_DEFINE(conn_callbacks) = {
@@ -125,11 +137,15 @@ static void BLE_find_photon(const bt_addr_le_t *addr, int8_t rssi, uint8_t adv_t
 
 
 uint8_t BLE_scan(){
+        ready_to_scan = false;
         uint8_t err;
 
         err = bt_le_scan_start(BT_LE_SCAN_ACTIVE, BLE_find_photon);
         if(err){
                 printk("Scanning failed err -  %d\n", err);
+                bt_le_scan_stop();
+                k_msleep(50);
+                ready_to_scan = true;
                 return err;
         }
 	printk("Scan function started succesfully...\n");
@@ -148,7 +164,6 @@ uint8_t BLE_init(){
 
 	printk("BLE_INIT succes\n");
 
-	BLE_scan();
         return 0;
 }
 
@@ -161,6 +176,9 @@ void BLE_ThreadFunct(void *control_q_ptr, void *p2, void *p3) {
         BLE_init(); 
 
         while (1) {
-                k_sleep(K_SECONDS(1));
+                if(ready_to_scan){
+                        BLE_scan();
+                }
+                k_msleep(500);
         }
 }
