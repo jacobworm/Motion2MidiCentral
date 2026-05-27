@@ -50,13 +50,17 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
 
     // TEST KODE, bare for at se at BLE data rent faktisk ændre på nogle settings
     gestureSettings[0].noteNr = 60;  // C4
-    gestureSettings[1].noteNr = 62;  // D4
+    gestureSettings[1].noteNr = 60;  // D4
+    gestureSettings[1].velocity = 0;
     gestureSettings[2].noteNr = 64;  // E4
-    gestureSettings[3].noteNr = 65;  // F4
+    gestureSettings[3].noteNr = 64;  // F4
+    gestureSettings[3].velocity = 0;
     gestureSettings[4].noteNr = 67;  // G4
-    gestureSettings[5].noteNr = 69;  // A4
+    gestureSettings[5].noteNr = 67;  // A4
+    gestureSettings[5].velocity = 0;
     gestureSettings[6].noteNr = 71;  // B4
-    gestureSettings[7].noteNr = 72;  // C5
+    gestureSettings[7].noteNr = 71;  // C5
+    gestureSettings[7].velocity = 0;
 
     struct k_msgq *midi_q = (struct k_msgq *)midi_q_ptr;
     struct k_msgq *control_q = (struct k_msgq *)control_q_ptr;
