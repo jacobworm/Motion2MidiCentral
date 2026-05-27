@@ -54,13 +54,14 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
         if (event.type == ProgramChange ||
             event.type == ChannelPressure) { // Program Change and Channel Pressure
                                             // messages only have one data byte
-        for (int i = 0; i < 2; i++) {
-            uart_poll_out(uart_dev, midi_msg[i]);
-        }
-        } else {
+            for (int i = 0; i < 2; i++) {
+                uart_poll_out(uart_dev, midi_msg[i]);
+            }
+        } 
+        else {
         for (int i = 0; i < 3; i++) {
             uart_poll_out(uart_dev, midi_msg[i]);
-        }
+            }
         }
         irq_unlock(key);
         printk("MIDI event transmitted: Type=%d, Channel=%d, Data1=%d, Data2=%d\n",

@@ -2,7 +2,8 @@
 #include "midiEvent.h"
 #include "gestureEvent.h"
 #include <zephyr/kernel.h>
-#include "BLE_central.h"
+//#include "BLE_central.h"
+#include "BLE_Simulator.h"
 
 #define MIDI_TX_STACK_SIZE 1024
 #define MIDI_TX_PRIORITY 7
@@ -23,7 +24,8 @@ K_THREAD_DEFINE(midiTxThread, MIDI_TX_STACK_SIZE, MidiTransmitThreadFunct,
 K_THREAD_DEFINE(controlThread, CONTROL_STACK_SIZE, ControlThreadFunct, &midi_q, &control_q,
                 NULL, CONTROL_PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(bleThread, BLE_STACK_SIZE, BLE_ThreadFunct, &control_q, NULL, NULL, BLE_PRIORITY, 0, 0);
+//K_THREAD_DEFINE(bleThread, BLE_STACK_SIZE, BLE_ThreadFunct, &control_q, NULL, NULL, BLE_PRIORITY, 0, 0);
+K_THREAD_DEFINE(bleSimulationThread, BLE_STACK_SIZE, BLE_Simulator_ThreadFunct, &control_q, NULL, NULL, BLE_PRIORITY, 0, 0);
 
 int main(void) { 
     return 0; 
