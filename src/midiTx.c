@@ -63,14 +63,10 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
   }
 
   while (1) {
-    /*// Waiting for que simulated by wait
-    k_sleep(K_MSEC(1000)); // Simulate waiting for a midi_q event to be ready
-    midiEvent event = {NoteOn, 1, 60, 100}; // Simulated MIDI event for
-    testing*/
-    // int ret = 0;
+    
     midiEvent event;
     ret = k_msgq_get(midi_q, &event,
-                     K_NO_WAIT); // polling the queue for a midiEvent, returns 0
+                     K_FOREVER); // polling the queue for a midiEvent, returns 0
                                  // if an event was received
     if (ret == 0) {              // on received midiEvent
       uint8_t midi_msg[3];
@@ -90,11 +86,10 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
                     ((event.channel - 1) & 0x0F); // Combine type and channel
       midi_msg[1] = event.data1;
       midi_msg[2] = event.data2;
-      // unsigned int key = irq_lock(); // Disable interrupts to ensure atomic
       // transmission
       if (event.type == ProgramChange ||
           event.type == ChannelPressure) { // Program Change og Channel Pressure
-                                           // messages jhar kun én databyte
+                                           // messages har kun én databyte
         uint8_t short_msg[2];
         for (int i = 0; i < 2; i++) {
           short_msg[i] = midi_msg[i];
@@ -106,7 +101,7 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
           counter++;
           k_sleep(K_MSEC(5)); // Vent 5 ms før næste forsøg
           ret = uart_tx(uart_dev, short_msg, 2, SYS_FOREVER_US);
-          if (counter > 5) { // Hvis det stadig er optaget efter 10 forsøg, log
+          if (counter > 5) { // Hvis det stadig er optaget efter 5 forsøg, log
                              // og drop beskeden
             printk("UART busy after multiple attempts, dropping MIDI event\n");
             break;
@@ -121,18 +116,13 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
           counter++;
           k_sleep(K_MSEC(5)); // Vent 5 ms før næste forsøg
           ret = uart_tx(uart_dev, midi_msg, 3, SYS_FOREVER_US);
-          if (counter > 5) { // Hvis det stadig er optaget efter 10 forsøg, log
+          if (counter > 5) { // Hvis det stadig er optaget efter 5 forsøg, log
                              // og drop beskeden
             printk("UART busy after multiple attempts, dropping MIDI event\n");
             break;
           }
         }
       }
-      /*for (int i = 0; i < 3; i++) {
-
-          //uart_poll_out(uart_dev, midi_msg[i]);
-      } */
-      // irq_unlock(key);
       printk(
           "MIDI event transmitted: Type=%d, Channel=%d, Data1=%d, Data2=%d\n",
           event.type, event.channel, event.data1, event.data2);

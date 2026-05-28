@@ -1,15 +1,15 @@
 #ifndef GESTUREEVENT_H
 #define GESTUREEVENT_H
 
-typedef enum{
-    Other = 0,
-    OneUp = 1,
-    OneDown = 2,
-    TwoUp = 3,
-    TwoDown = 4,
-    SlowUp = 5,
-    SlowDown = 6,
-    Vibrato = 7
+typedef enum {
+  OneDown = 0,
+  OneUp = 1,
+  TwoDown = 2,
+  TwoUp = 3,
+  Other = 4,
+  SlowDown = 5,
+  SlowUp = 6,
+  Vibrato = 7
 } gestureEvent;
 
 #endif
