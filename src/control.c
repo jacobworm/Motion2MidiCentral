@@ -1,7 +1,6 @@
 #include "control.h"
 #include <zephyr/kernel.h>
 
-
 gestureSetting gestureSettings[8] = {
     0}; // Array to hold settings for 8 gestures
 int prev_gesture = 4;
@@ -70,7 +69,7 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
   };
   (void)p3;
 
-  // definér gestureSettings
+  // definér gestureSettings, debug med toner:
   gestureSettings[0].noteNr = 60; // C4
   gestureSettings[1].noteNr = 60; // D4
   gestureSettings[1].velocity = 0;
@@ -83,6 +82,29 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
   gestureSettings[6].noteNr = 71; // B4
   gestureSettings[7].noteNr = 71; // C5
   gestureSettings[7].velocity = 0;
+
+  // definér gestureSettings, med control change:
+  gestureSettings[0].type = ControlChange;
+  gestureSettings[0].controllerNr = 20;
+  gestureSettings[0].value = 127;
+  gestureSettings[1].type = ControlChange;
+  gestureSettings[1].controllerNr = 21;
+  gestureSettings[1].value = 127;
+  gestureSettings[2].type = ControlChange;
+  gestureSettings[2].controllerNr = 22;
+  gestureSettings[2].value = 127;
+  gestureSettings[3].type = ControlChange;
+  gestureSettings[3].controllerNr = 23;
+  gestureSettings[3].value = 127;
+  gestureSettings[5].type = ControlChange;
+  gestureSettings[5].controllerNr = 24;
+  gestureSettings[5].value = 127;
+  gestureSettings[6].type = ControlChange;
+  gestureSettings[6].controllerNr = 25;
+  gestureSettings[6].value = 127;
+  gestureSettings[7].type = ControlChange;
+  gestureSettings[7].controllerNr = 26;
+  gestureSettings[7].value = 127;
 
   struct k_msgq *midi_q = (struct k_msgq *)midi_q_ptr;
   struct k_msgq *control_q = (struct k_msgq *)control_q_ptr;
