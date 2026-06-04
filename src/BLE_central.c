@@ -85,7 +85,6 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
         printk("Forbindelse afbrudt, reason: %d\n", reason);
 
         if(thinkerbell_conn != conn){
-                printk("hej");
                 return;
         }
         bt_conn_unref(thinkerbell_conn);
@@ -159,7 +158,7 @@ uint8_t BLE_init(){
 	err = bt_enable(NULL);
 	if (err) {
 		printk("BLE_INIT failed err - %d\n", err);
-		return 0;
+		return err;
 	}
 
 	printk("BLE_INIT succes\n");
@@ -169,11 +168,13 @@ uint8_t BLE_init(){
 
 
 void BLE_ThreadFunct(void *control_q_ptr, void *p2, void *p3) {
-        (void)p2; 
+        (void)p2;
         (void)p3;
         BLE_control_q = (struct k_msgq *)control_q_ptr;
 
-        BLE_init(); 
+        if (BLE_init() != 0) {
+                return;
+        }
 
         while (1) {
                 if(ready_to_scan){
