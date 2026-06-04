@@ -179,6 +179,6 @@ void BLE_ThreadFunct(void *control_q_ptr, void *p2, void *p3) {
                 if(ready_to_scan){
                         BLE_scan();
                 }
-                k_msleep(500);
+                k_msleep(10);
         }
 }

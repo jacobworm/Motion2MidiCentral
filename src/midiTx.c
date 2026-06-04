@@ -54,6 +54,8 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
   if (Midi_init() != 0) {
     return;
   }
+  printk("UART device for midi: %s\n", uart_dev->name);
+
   int ret = 0;
   ret = uart_callback_set(uart_dev, uart_cb,
                           NULL); // Set the UART callback function
@@ -63,7 +65,16 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
   }
 
   while (1) {
-    
+    // Debugging: Send en test MIDI Note On besked hvert sekund med polling
+    // midi:
+    /*while (1) {
+        uart_poll_out(uart_dev, 0x90);
+        uart_poll_out(uart_dev, 60);
+        uart_poll_out(uart_dev, 127);
+
+        k_sleep(K_SECONDS(1));
+    }*/
+
     midiEvent event;
     ret = k_msgq_get(midi_q, &event,
                      K_FOREVER); // polling the queue for a midiEvent, returns 0
@@ -71,7 +82,7 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
     if (ret == 0) {              // on received midiEvent
       uint8_t midi_msg[3];
       if (event.channel < 1 || event.channel > 16) {
-        printk("Invalid MIDI channel: %d\n", event.channel);
+        printk("Invalid MIDI channel: %d, gesture: other\n", event.channel);
         continue;
       }
       if (event.data1 > 127 || event.data2 > 127) {
@@ -112,16 +123,33 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
             uart_dev, midi_msg, 3,
             SYS_FOREVER_US); // Attempt to transmit MIDI message without waiting
         int counter = 0;
-        while (ret == -EBUSY) { // Hvis UART er optaget, vent og prøv igen
+        if (ret < 0) {
+          printk("uart_tx returned %d\n", ret);
+        }
+
+        while (ret == -EBUSY) {
           counter++;
-          k_sleep(K_MSEC(5)); // Vent 5 ms før næste forsøg
+          k_sleep(K_MSEC(5));
+
           ret = uart_tx(uart_dev, midi_msg, 3, SYS_FOREVER_US);
-          if (counter > 5) { // Hvis det stadig er optaget efter 5 forsøg, log
-                             // og drop beskeden
-            printk("UART busy after multiple attempts, dropping MIDI event\n");
+
+          printk("uart_tx retry %d returned %d\n", counter, ret);
+
+          if (counter > 5) {
+            printk("UART busy after multiple attempts\n");
             break;
           }
         }
+
+        /*        while (ret == -EBUSY) { // Hvis UART er optaget, vent og prøv
+           igen counter++; k_sleep(K_MSEC(5)); // Vent 5 ms før næste forsøg ret
+           = uart_tx(uart_dev, midi_msg, 3, SYS_FOREVER_US); if (counter > 5) {
+           // Hvis det stadig er optaget efter 5 forsøg, log
+                                     // og drop beskeden
+                    printk("UART busy after multiple attempts, dropping MIDI
+           event\n"); break;
+                  }
+                }*/
       }
       printk(
           "MIDI event transmitted: Type=%d, Channel=%d, Data1=%d, Data2=%d\n",
