@@ -50,15 +50,15 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
   struct k_msgq *midi_q = (struct k_msgq *)que_ptr;
   (void)p2;
   (void)p3;
-
+  k_sleep(K_SECONDS(5)); // Give some time for other threads to initialize
   if (Midi_init() != 0) {
     return;
   }
   printk("UART device for midi: %s\n", uart_dev->name);
 
   int ret = 0;
-  ret = uart_callback_set(uart_dev, uart_cb,
-                          NULL); // Set the UART callback function
+  // ret = uart_callback_set(uart_dev, uart_cb,
+  //                         NULL); // Set the UART callback function
   if (ret) {
     printk("Failed to set UART callback: %d\n", ret);
     return;
@@ -67,20 +67,22 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
   while (1) {
     // Debugging: Send en test MIDI Note On besked hvert sekund med polling
     // midi:
-    /*while (1) {
-        uart_poll_out(uart_dev, 0x90);
-        uart_poll_out(uart_dev, 60);
-        uart_poll_out(uart_dev, 127);
-
-        k_sleep(K_SECONDS(1));
-    }*/
-
+/*
+    while (1) {
+      printk("UART ready: %d\n", device_is_ready(uart_dev));
+      uart_poll_out(uart_dev, 0x90);
+      uart_poll_out(uart_dev, 60);
+      uart_poll_out(uart_dev, 127);
+      printk("Test MIDI Note On sent\n");
+      k_sleep(K_SECONDS(1));
+    }
+*/
     midiEvent event;
     ret = k_msgq_get(midi_q, &event,
                      K_FOREVER); // polling the queue for a midiEvent, returns 0
                                  // if an event was received
     if (ret == 0) {              // on received midiEvent
-      uint8_t midi_msg[3];
+      static uint8_t midi_msg[3];
       if (event.channel < 1 || event.channel > 16) {
         printk("Invalid MIDI channel: %d, gesture: other\n", event.channel);
         continue;
@@ -101,7 +103,7 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
       if (event.type == ProgramChange ||
           event.type == ChannelPressure) { // Program Change og Channel Pressure
                                            // messages har kun én databyte
-        uint8_t short_msg[2];
+        static uint8_t short_msg[2];
         for (int i = 0; i < 2; i++) {
           short_msg[i] = midi_msg[i];
           // uart_poll_out(uart_dev, midi_msg[i]);

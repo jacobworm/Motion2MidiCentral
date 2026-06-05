@@ -2,6 +2,11 @@
     status = "okay";
     current-speed = <31250>;
 };
+
+&gpio_fwd {
+    status = "disabled";
+};
+
 &i2c1 {
     status = "disabled";
 };

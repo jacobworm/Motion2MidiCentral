@@ -6,7 +6,7 @@
 #include "BLE_central.h"
 #include "BLE_Simulator.h"
 
-#define MIDI_TX_STACK_SIZE 1024
+#define MIDI_TX_STACK_SIZE 4096
 #define MIDI_TX_PRIORITY 1
 #define CONTROL_STACK_SIZE 1024
 #define CONTROL_PRIORITY 7
