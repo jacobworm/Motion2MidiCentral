@@ -67,16 +67,16 @@ void MidiTransmitThreadFunct(void *que_ptr, void *p2, void *p3) {
   while (1) {
     // Debugging: Send en test MIDI Note On besked hvert sekund med polling
     // midi:
-/*
-    while (1) {
-      printk("UART ready: %d\n", device_is_ready(uart_dev));
-      uart_poll_out(uart_dev, 0x90);
-      uart_poll_out(uart_dev, 60);
-      uart_poll_out(uart_dev, 127);
-      printk("Test MIDI Note On sent\n");
-      k_sleep(K_SECONDS(1));
-    }
-*/
+    /*
+        while (1) {
+          printk("UART ready: %d\n", device_is_ready(uart_dev));
+          uart_poll_out(uart_dev, 0x90);
+          uart_poll_out(uart_dev, 60);
+          uart_poll_out(uart_dev, 127);
+          printk("Test MIDI Note On sent\n");
+          k_sleep(K_SECONDS(1));
+        }
+    */
     midiEvent event;
     ret = k_msgq_get(midi_q, &event,
                      K_FOREVER); // polling the queue for a midiEvent, returns 0
