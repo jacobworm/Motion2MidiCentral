@@ -68,7 +68,7 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
     gesture_setting_default(&gestureSettings[i]);
   };
   (void)p3;
-
+  /*
   // definér gestureSettings, debug med toner:
   gestureSettings[0].noteNr = 60; // C4
   gestureSettings[1].noteNr = 60; // D4
@@ -82,7 +82,8 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
   gestureSettings[6].noteNr = 71; // B4
   gestureSettings[7].noteNr = 71; // C5
   gestureSettings[7].velocity = 0;
-
+  */
+  
   // definér gestureSettings, med control change:
   gestureSettings[0].type = ControlChange;
   gestureSettings[0].controllerNr = 20;
@@ -105,6 +106,7 @@ void ControlThreadFunct(void *midi_q_ptr, void *control_q_ptr, void *p3) {
   gestureSettings[7].type = ControlChange;
   gestureSettings[7].controllerNr = 26;
   gestureSettings[7].value = 127;
+
 
   struct k_msgq *midi_q = (struct k_msgq *)midi_q_ptr;
   struct k_msgq *control_q = (struct k_msgq *)control_q_ptr;
