@@ -74,12 +74,9 @@ static void connected(struct bt_conn *conn, uint8_t err) {
   // discovery parameter sættes her
   discover_params.uuid = NULL; // default for at finde alt
   discover_params.func = discover_func;
-  discover_params.start_handle =
-      BT_ATT_FIRST_ATTRIBUTE_HANDLE; // alle atributter er en handle søgning,
-                                     // her starter vi bare fra den første af
-  discover_params.end_handle =
-      BT_ATT_LAST_ATTRIBUTE_HANDLE; // og den skal søge op til maks mulige
-                                    // handles
+  discover_params.start_handle = BT_ATT_FIRST_ATTRIBUTE_HANDLE; // alle atributter er en handle søgning, her starter vi bare fra den første af
+  discover_params.end_handle = BT_ATT_LAST_ATTRIBUTE_HANDLE; // og den skal søge op til maks mulige handles
+
   discover_params.type = BT_GATT_DISCOVER_ATTRIBUTE; 
   bt_gatt_discover(conn, &discover_params);
 }
@@ -106,11 +103,9 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
 // https://docs.zephyrproject.org/latest/doxygen/html/group__bt__gap.html#ga652eef01e5256e0d820cd1f4db877429
 // søg: bt_data_parse
 static bool BLE_check_addr(struct bt_data *data, void *user_data) {
-  const bt_addr_le_t *addr =
-      (const bt_addr_le_t *)user_data; // skal caste userdata til bt_addr_le_t
+  const bt_addr_le_t *addr = (const bt_addr_le_t *)user_data; // skal caste userdata til bt_addr_le_t
 
-  if (data->type == BT_DATA_UUID128_ALL) { // TYPE: fandt ud af dte var nemmer
-                                           // at
+  if (data->type == BT_DATA_UUID128_ALL) { 
 
     const uint8_t uuid[] = {// Det UUID som er sat på Photon
                             0xab, 0x90, 0x78, 0x56, 0x34, 0x12, 0x34, 0x12,
@@ -122,8 +117,7 @@ static bool BLE_check_addr(struct bt_data *data, void *user_data) {
       bt_le_scan_stop(); // stopper sacn
       // https://docs.zephyrproject.org/latest/doxygen/html/group__bt__conn.html#ga8d66f3e0262a51279e9fa8b3139252e6
       // søg: bt_conn_le_create
-      bt_conn_le_create(addr, BT_CONN_LE_CREATE_CONN, BT_LE_CONN_PARAM_DEFAULT,
-                        &thinkerbell_conn); // alt er bare default
+      bt_conn_le_create(addr, BT_CONN_LE_CREATE_CONN, BT_LE_CONN_PARAM_DEFAULT, &thinkerbell_conn); // alt er bare default
       return false;
     }
   }
