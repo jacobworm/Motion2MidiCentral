@@ -10,7 +10,7 @@ static bool ready_to_scan = true;
 static struct bt_gatt_subscribe_params subscribe_params;
 static struct k_msgq *BLE_control_q;
 
-static uint8_t notify_func(struct bt_conn *conn, struct bt_gatt_subscribe_params *params, const void *data, uint16_t length)
+static uint8_t notify(struct bt_conn *conn, struct bt_gatt_subscribe_params *params, const void *data, uint16_t length)
 {
     if (data == NULL) {
         printk("unsubscribed\n");
@@ -33,10 +33,10 @@ static uint8_t notify_func(struct bt_conn *conn, struct bt_gatt_subscribe_params
 
 static struct bt_gatt_discover_params discover_params;
 
-static uint8_t discover_func(struct bt_conn *conn, const struct bt_gatt_attr *attr, struct bt_gatt_discover_params *params)
+static uint8_t discover(struct bt_conn *conn, const struct bt_gatt_attr *attr, struct bt_gatt_discover_params *params)
 {
         if (attr == NULL) {
-                subscribe_params.notify = notify_func;
+                subscribe_params.notify = notify;
                 subscribe_params.value_handle = 52;  //UUID bestemt på Photon. kommer på handle 52 som er fundet ved debug
                 subscribe_params.ccc_handle = 53;    //CCCD handle
                 subscribe_params.value = BT_GATT_CCC_NOTIFY;
@@ -72,7 +72,7 @@ static void connected(struct bt_conn *conn, uint8_t err)
 
         //discovery parameter sættes her
         discover_params.uuid = NULL;           //default for at finde alt
-        discover_params.func = discover_func;
+        discover_params.func = discover;
         discover_params.start_handle = BT_ATT_FIRST_ATTRIBUTE_HANDLE;          //alle atributter er en handle søgning, her starter vi bare fra den første af
         discover_params.end_handle = BT_ATT_LAST_ATTRIBUTE_HANDLE;             //og den skal søge op til maks mulige handles
         discover_params.type = BT_GATT_DISCOVER_ATTRIBUTE;                     
