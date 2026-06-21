@@ -100,27 +100,6 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
 };
 //-------- connect/disconnect struktur END----------------
 
-// https://docs.zephyrproject.org/latest/doxygen/html/group__bt__gap.html#ga652eef01e5256e0d820cd1f4db877429
-// søg: bt_data_parse
-static bool BLE_check_addr(struct bt_data *data, void *user_data) {
-  const bt_addr_le_t *addr = (const bt_addr_le_t *)user_data; // skal caste userdata til bt_addr_le_t
-
-  if (data->type == BT_DATA_UUID128_ALL) { 
-
-    const uint8_t uuid[] = {// Det UUID som er sat på Photon
-                            0xab, 0x90, 0x78, 0x56, 0x34, 0x12, 0x34, 0x12,
-                            0x34, 0x12, 0x34, 0x12, 0x78, 0x56, 0x34, 0x12};
-
-    if (memcmp(data->data, uuid, 16) == 0) {
-      printk("Thinkerbell fundet!\n");
-      // connect
-      bt_le_scan_stop(); // stopper sacn
-      // https://docs.zephyrproject.org/latest/doxygen/html/group__bt__conn.html#ga8d66f3e0262a51279e9fa8b3139252e6
-      // søg: bt_conn_le_create
-      bt_conn_le_create(addr, BT_CONN_LE_CREATE_CONN, BT_LE_CONN_PARAM_DEFAULT, &thinkerbell_conn); // alt er bare default
-      return false;
-    }
-  }
 
 //https://docs.zephyrproject.org/latest/doxygen/html/group__bt__gap.html#ga652eef01e5256e0d820cd1f4db877429 søg: bt_data_parse
 static bool BLE_check_addr(struct bt_data *data, void *user_data)
