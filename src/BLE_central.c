@@ -73,7 +73,7 @@ static void connected(struct bt_conn *conn, uint8_t err) {
 
   // discovery parameter sættes her
   discover_params.uuid = NULL; // default for at finde alt
-  discover_params.func = discover_func;
+  discover_params.func = discover;
   discover_params.start_handle = BT_ATT_FIRST_ATTRIBUTE_HANDLE; // alle atributter er en handle søgning, her starter vi bare fra den første af
   discover_params.end_handle = BT_ATT_LAST_ATTRIBUTE_HANDLE; // og den skal søge op til maks mulige handles
 
